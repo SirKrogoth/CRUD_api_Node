@@ -7,11 +7,18 @@ function findUser(id){
 }
 
 function findUsers(){
-    try{
+
+    if(!fs.existsSync(FILE_PATH)) return [];
+
+    const rawData = fs.readFileSync(FILE_PATH);
+    return JSON.parse(rawData);
+
+    /**
+     * try{
         return require(FILE_PATH);
     }catch(error){
         return []
-    }
+    }*/
 }
 
 function insertUser(user){
@@ -24,13 +31,21 @@ function insertUser(user){
 
 function updateUser(id, user){
     const users = findUsers();//Pega todos os usuários e coloca no array
-    //Abaixo função responsável por atualizar o indice
-    users.forEach((item, index, array) => {
+    const index = users.findIndex(item => item.id === id);//Funçao mais performatica que o forEach, busca o indice
+
+    if(index === -1) return {}; //caso nao tenha informação, irá retornar -1
+
+    for(let key in user){
+        users[index][key] = user[key];
+    }
+
+    //Abaixo função responsável por atualizar o indice    
+    /*users.forEach((item, index, array) => {
         if(item.id === id){
             user.id = id;
             array[index] = user;
         }
-    });
+    });*/
 
     fs.writeFileSync(FILE_PATH, JSON.stringify(users));//Escreve de modo Sincrono, ou seja, aguarda o retorno
     return user;//retorna user com o id atualizado
